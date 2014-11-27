@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import message.ChatMessage;
 
 /**
@@ -21,11 +22,16 @@ public class ClientBackEnd implements Runnable {
     private Socket clientSocket;
     private ObjectInputStream input;
     private ObjectOutputStream output;
+    private FXMLDocumentController controller;
     
-    public ClientBackEnd() {
+    
+    
+    public ClientBackEnd(FXMLDocumentController controller) {
         try {
-            clientSocket = new Socket("localhost",3011);
+            clientSocket = new Socket("localhost",3010);
+            this.controller = controller;
         } catch (IOException ex) {
+            System.out.println("1");
             ex.printStackTrace();
         }
     }
@@ -37,15 +43,24 @@ public class ClientBackEnd implements Runnable {
             output = new ObjectOutputStream(clientSocket.getOutputStream());
             input = new ObjectInputStream(clientSocket.getInputStream());
         } catch (IOException ex) {
+            System.out.println("2");
             ex.printStackTrace();
         }
         
         // read and write from socket until user closes the app
         while(true) {
             try {
-                ChatMessage m = (ChatMessage)input.readObject();
-                System.out.println(m.getChatMessage());
+                final ChatMessage m = (ChatMessage)input.readObject();
+                //System.out.println(m.getChatMessage());
+                // Runs in Event Dispatcher Thread
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        controller.updateTextArea(m.getUserName() + " : " + m.getChatMessage());
+                    }
+                });
             } catch (IOException | ClassNotFoundException ex) {
+                System.out.println("3");
                 ex.printStackTrace();
             }
         }
@@ -56,6 +71,7 @@ public class ClientBackEnd implements Runnable {
             output.writeObject(cm);
             output.flush();
         } catch (IOException ex) {
+            System.out.println("4");
             ex.printStackTrace();
         }
     }

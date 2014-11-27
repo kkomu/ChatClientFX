@@ -23,18 +23,7 @@ public class ChatClientFX extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
         
         Scene scene = new Scene(root);
-        
         stage.setScene(scene);
-        
-        // Create thread for client back end
-        ClientBackEnd backEnd = new ClientBackEnd();
-        Thread backThread = new Thread(backEnd);
-        backThread.start();
-        
-        ChatMessage chatM = new ChatMessage();
-        chatM.setChatMessage("Hello yello!");
-        backEnd.sendMessage(chatM);
-        
         stage.show();
     }
 
