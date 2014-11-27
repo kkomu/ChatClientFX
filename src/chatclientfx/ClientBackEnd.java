@@ -24,8 +24,6 @@ public class ClientBackEnd implements Runnable {
     private ObjectOutputStream output;
     private FXMLDocumentController controller;
     
-    
-    
     public ClientBackEnd(FXMLDocumentController controller) {
         try {
             clientSocket = new Socket("localhost",3010);
@@ -53,12 +51,23 @@ public class ClientBackEnd implements Runnable {
                 final ChatMessage m = (ChatMessage)input.readObject();
                 //System.out.println(m.getChatMessage());
                 // Runs in Event Dispatcher Thread
-                Platform.runLater(new Runnable() {
+                if(m.isUserListUpdate()) {
+                    Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        controller.updateUserList(m.getChatMessage());
+                    }
+                });
+                }
+                else {
+                    Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
                         controller.updateTextArea(m.getUserName() + " : " + m.getChatMessage());
                     }
                 });
+                }
+                
             } catch (IOException | ClassNotFoundException ex) {
                 System.out.println("3");
                 ex.printStackTrace();

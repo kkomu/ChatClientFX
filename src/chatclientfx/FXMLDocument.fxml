@@ -22,7 +22,7 @@
                   <Insets bottom="10.0" left="10.0" right="5.0" top="10.0" />
                </HBox.margin>
             </TextField>
-            <Button fx:id="btnSend" mnemonicParsing="false" onAction="#sendChatMessage" text="Send">
+            <Button fx:id="btnSend" disable="true" mnemonicParsing="false" onAction="#sendChatMessage" text="Send">
                <HBox.margin>
                   <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                </HBox.margin>
@@ -35,7 +35,7 @@
          <children>
             <Label text="Name: ">
                <HBox.margin>
-                  <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+                  <Insets bottom="10.0" left="10.0" right="5.0" top="15.0" />
                </HBox.margin>
             </Label>
             <TextField fx:id="userName">
@@ -43,11 +43,21 @@
                   <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                </HBox.margin>
             </TextField>
+            <Button fx:id="btnJoin" mnemonicParsing="false" onAction="#joinToChat" text="Join">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="btnQuit" mnemonicParsing="false" onAction="#quitChat" text="Quit">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+               </HBox.margin>
+            </Button>
          </children>
       </HBox>
    </top>
    <right>
-      <ListView prefHeight="255.0" prefWidth="121.0" BorderPane.alignment="CENTER">
+      <ListView fx:id="userListView" prefHeight="255.0" prefWidth="121.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </BorderPane.margin>
