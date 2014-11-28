@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -18,6 +19,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import message.ChatMessage;
 
 /**
@@ -29,6 +34,8 @@ public class FXMLDocumentController implements Initializable {
     private ClientBackEnd backEnd;
     private Thread backThread;
     private String user;
+    private WebEngine engine;
+    private StringBuilder chatHistory = new StringBuilder();
     
     @FXML
     Button btnJoin;
@@ -43,7 +50,7 @@ public class FXMLDocumentController implements Initializable {
     TextField chatMessage;
     
     @FXML
-    TextArea chatMessageArea;
+    WebView chatMessageArea;
     
     @FXML
     ListView userListView;
@@ -76,17 +83,26 @@ public class FXMLDocumentController implements Initializable {
     }
     
     @FXML
-    private void sendChatMessage(ActionEvent e) {
+    private void handleSendButton(ActionEvent e) {
+        sendChatMessage();
+    }
+    
+    @FXML
+    private void handleTextFieldEnterKey(KeyEvent e) {
+        if (e.getCode() == KeyCode.ENTER) {
+            sendChatMessage();
+        }
+    }
+    
+    private void sendChatMessage() {
         ChatMessage cm = new ChatMessage();
         cm.setChatMessage(chatMessage.getText());
         String privateName = "";
         if (userListView.getSelectionModel().getSelectedItem() != null) {
             privateName = (String) userListView.getSelectionModel().getSelectedItem();
         }
-
-        //System.out.printf("private name: %s\n",privateName);
+        // Send private message if username is selected from list view
         if( !privateName.isEmpty() && !privateName.matches("<public>" ) ) {
-            System.out.println("ollan private-haarassa");
             cm.setIsPrivate(true);
             cm.setPrivateName(privateName);
         }
@@ -95,8 +111,28 @@ public class FXMLDocumentController implements Initializable {
         chatMessage.clear();
     }
     
-    public void updateTextArea(String message) {
-        chatMessageArea.appendText(message +"\n");
+    //public void updateTextArea(String message) {
+    public void updateTextArea(ChatMessage cm) {
+        String message = cm.getUserName()+": "+cm.getChatMessage();
+        
+        if(cm.getUserName().equals(this.user)) {
+            if(cm.isIsPrivate()) {
+                chatHistory.append("<font color='green'><b>"+message+"</b></font><br>");
+            }
+            else {
+                chatHistory.append("<font color='green'>"+message+"</font><br>");
+            }
+        }
+        else {
+            if(cm.isIsPrivate()) {
+                chatHistory.append("<font color='black'><b>"+message+"</b></font><br>");
+            }
+            else {
+                chatHistory.append("<font color='black'>"+message+"</font><br>");
+            }
+        }
+        String content = chatHistory.toString();
+        engine.loadContent(content);
     }
 
     public void updateUserList(String users) {
@@ -105,7 +141,6 @@ public class FXMLDocumentController implements Initializable {
         userList.add("<public>");
         for(String i: test) {
             userList.add(i);
-            //System.out.printf("User: %s\n",i);
         }
         userListView.setItems(userList);
     }
@@ -128,6 +163,8 @@ public class FXMLDocumentController implements Initializable {
         btnJoin.setDisable(false);
         btnSend.setDisable(true);
         chatMessage.setDisable(true);
+        
+        engine = chatMessageArea.getEngine();
         
         backEnd = new ClientBackEnd(this);
         backThread = new Thread(backEnd);
