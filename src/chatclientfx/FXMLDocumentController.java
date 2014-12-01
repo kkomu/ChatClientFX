@@ -103,7 +103,7 @@ public class FXMLDocumentController implements Initializable {
         }
         // Send private message if username is selected from list view
         if( !privateName.isEmpty() && !privateName.matches("<public>" ) ) {
-            cm.setIsPrivate(true);
+            cm.setPrivateMessage(true);
             cm.setPrivateName(privateName);
         }
         cm.setUserName(this.user);
@@ -116,7 +116,7 @@ public class FXMLDocumentController implements Initializable {
         String message = cm.getUserName()+": "+cm.getChatMessage();
         
         if(cm.getUserName().equals(this.user)) {
-            if(cm.isIsPrivate()) {
+            if(cm.isPrivateMessage()) {
                 chatHistory.append("<font color='green'><b>"+message+"</b></font><br>");
             }
             else {
@@ -124,7 +124,7 @@ public class FXMLDocumentController implements Initializable {
             }
         }
         else {
-            if(cm.isIsPrivate()) {
+            if(cm.isPrivateMessage()) {
                 chatHistory.append("<font color='black'><b>"+message+"</b></font><br>");
             }
             else {
